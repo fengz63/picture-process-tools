@@ -1,4 +1,4 @@
-# Picture Resize Tools
+# Picture process Tools
 
 A batch image processing tool written in Golang that supports JPG/PNG format conversion and intelligent resizing.
 
@@ -21,7 +21,7 @@ go mod tidy
 
 ### 2. Build the Program
 ```bash
-go build -o picture-resize-tools
+go build -o picture-process-tools
 ```
 
 ### 3. Usage Examples
@@ -29,19 +29,19 @@ go build -o picture-resize-tools
 #### Basic Usage
 ```bash
 # Process all images in the current directory, output to ./output directory
-./picture-resize-tools process
+./picture-process-tools process
 
 # Specify input and output directories
-./picture-resize-tools process -i ./photos -o ./processed
+./picture-process-tools process -i ./photos -o ./processed
 
 # Export as PNG format
-./picture-resize-tools process -f png
+./picture-process-tools process -f png
 
 # Set maximum width to 1920, quality to 90
-./picture-resize-tools process -W 1920 -H 1920 -q 90
+./picture-process-tools process -W 1920 -H 1920 -q 90
 
 # Recursively process subdirectories
-./picture-resize-tools process -r
+./picture-process-tools process -r
 ```
 
 #### Complete Parameter Description

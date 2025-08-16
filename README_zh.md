@@ -1,4 +1,4 @@
-# 图片批量处理工具 (Picture Resize Tools)
+# 图片批量处理工具 (Picture process Tools)
 
 一个使用 Golang 编写的批量图片处理工具，支持 JPG/PNG 格式转换和智能缩放。
 
@@ -21,7 +21,7 @@ go mod tidy
 
 ### 2. 构建程序
 ```bash
-go build -o picture-resize-tools
+go build -o picture-process-tools
 ```
 
 ### 3. 使用示例
@@ -29,19 +29,19 @@ go build -o picture-resize-tools
 #### 基本使用
 ```bash
 # 处理当前目录下所有图片，输出到 ./output 目录
-./picture-resize-tools process
+./picture-process-tools process
 
 # 指定输入和输出目录
-./picture-resize-tools process -i ./photos -o ./processed
+./picture-process-tools process -i ./photos -o ./processed
 
 # 输出为 PNG 格式
-./picture-resize-tools process -f png
+./picture-process-tools process -f png
 
 # 设置最大宽度为 1920，质量为 90
-./picture-resize-tools process -W 1920 -H 1920 -q 90
+./picture-process-tools process -W 1920 -H 1920 -q 90
 
 # 递归处理子目录
-./picture-resize-tools process -r
+./picture-process-tools process -r
 ```
 
 #### 完整参数说明
