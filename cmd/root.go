@@ -12,6 +12,7 @@ var (
 	maxHeight    int
 	quality      int
 	recursive    bool
+	workers      int
 )
 
 var rootCmd = &cobra.Command{
@@ -31,6 +32,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "format", "f", "jpg", "Output format (jpg, png)")
 	rootCmd.PersistentFlags().IntVarP(&maxWidth, "width", "W", 1920, "Maximum width")
 	rootCmd.PersistentFlags().IntVarP(&maxHeight, "height", "H", 1920, "Maximum height")
-	rootCmd.PersistentFlags().IntVarP(&quality, "quality", "q", 85, "Output quality (1-100)")
+	rootCmd.PersistentFlags().IntVarP(&quality, "quality", "q", 90, "Output quality (1-100)")
 	rootCmd.PersistentFlags().BoolVarP(&recursive, "recursive", "r", false, "Recursively process subdirectories")
+	rootCmd.PersistentFlags().IntVarP(&workers, "workers", "w", 4, "Number of concurrent workers")
 }

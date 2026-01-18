@@ -37,8 +37,8 @@ go build -o picture-process-tools
 # Export as PNG format
 ./picture-process-tools process -f png
 
-# Set maximum width to 1920, quality to 90
-./picture-process-tools process -W 1920 -H 1920 -q 90
+# Set maximum width to 1920, quality to 90, 8 workers
+./picture-process-tools process -W 1920 -H 1920 -q 90 -w 8
 
 # Recursively process subdirectories
 ./picture-process-tools process -r
@@ -54,6 +54,7 @@ go build -o picture-process-tools
 | maxWidth  | -W    | 1920    | Maximum width |
 | maxHeight | -H    | 1920    | Maximum height |
 | quality   | -q    | 90      | JPEG quality (1-100) |
+| workers   | -w    | 4       | Number of concurrent workers |
 | recursive | -r    | false   | Recursively process subdirectories |
 | workers   | -w    | 4       | Number of concurrent workers |
 

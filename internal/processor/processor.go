@@ -52,11 +52,7 @@ func ProcessImageWithSameFormat(inputPath string, config Config) error {
 	outputPath := generateOutputPathWithSameFormat(inputPath, config.OutputDir)
 
 	// Get original format
-	ext := filepath.Ext(strings.ToLower(inputPath))
-	format := "jpg" // default
-	if ext == ".png" {
-		format = "png"
-	}
+	format := getImageFormat(inputPath)
 
 	// Save image
 	return saveImage(img, outputPath, format, config.Quality)
@@ -154,6 +150,26 @@ func generateOutputPath(inputPath, outputDir, format string) string {
 func generateOutputPathWithSameFormat(inputPath, outputDir string) string {
 	filename := filepath.Base(inputPath)
 	return filepath.Join(outputDir, filename)
+}
+
+// getImageFormat determines the image format from file extension
+func getImageFormat(path string) string {
+	ext := filepath.Ext(strings.ToLower(path))
+
+	switch ext {
+	case ".jpg", ".jpeg":
+		return "jpg"
+	case ".png":
+		return "png"
+	case ".bmp":
+		return "bmp"
+	case ".tiff", ".tif":
+		return "tiff"
+	case ".heic", ".heif":
+		return "jpg" // Convert HEIC to JPG by default
+	default:
+		return "jpg" // Default to JPG
+	}
 }
 
 func saveImage(img image.Image, path, format string, quality int) error {

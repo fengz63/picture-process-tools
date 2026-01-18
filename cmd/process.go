@@ -22,16 +22,46 @@ func init() {
 	rootCmd.AddCommand(processCmd)
 }
 
-func runProcess(cmd *cobra.Command, args []string) {
+// validateInputs validates command line inputs
+func validateInputs() error {
 	// Validate output format
 	if outputFormat != "jpg" && outputFormat != "png" {
-		fmt.Println("Error: Output format must be jpg or png")
+		return fmt.Errorf("output format must be jpg or png, got: %s", outputFormat)
+	}
+
+	// Validate input directory exists
+	if _, err := os.Stat(inputDir); os.IsNotExist(err) {
+		return fmt.Errorf("input directory does not exist: %s", inputDir)
+	}
+
+	// Validate quality range
+	if quality < 1 || quality > 100 {
+		return fmt.Errorf("quality must be between 1 and 100, got: %d", quality)
+	}
+
+	// Validate dimensions
+	if maxWidth <= 0 || maxHeight <= 0 {
+		return fmt.Errorf("maximum dimensions must be positive, got: %dx%d", maxWidth, maxHeight)
+	}
+
+	// Validate worker count
+	if workers <= 0 {
+		return fmt.Errorf("worker count must be positive, got: %d", workers)
+	}
+
+	return nil
+}
+
+func runProcess(cmd *cobra.Command, args []string) {
+	// Validate inputs
+	if err := validateInputs(); err != nil {
+		fmt.Printf("Input validation failed: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Create output directory
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
-		fmt.Printf("Failed to create output directory: %v\n", err)
+		fmt.Printf("Failed to create output directory '%s': %v\n", outputDir, err)
 		os.Exit(1)
 	}
 
@@ -122,7 +152,7 @@ func separateImageFiles(files []string) ([]string, []string) {
 // Process images concurrently
 func processImagesConcurrently(files []string, config processor.Config) {
 	var wg sync.WaitGroup
-	semaphore := make(chan struct{}, 4) // Limit concurrency
+	semaphore := make(chan struct{}, workers) // Use configurable worker count
 
 	for _, file := range files {
 		wg.Add(1)
@@ -145,7 +175,7 @@ func processImagesConcurrently(files []string, config processor.Config) {
 // Process images concurrently while keeping the same format
 func processImagesWithSameFormat(files []string, config processor.Config) {
 	var wg sync.WaitGroup
-	semaphore := make(chan struct{}, 4) // Limit concurrency
+	semaphore := make(chan struct{}, workers) // Use configurable worker count
 
 	for _, file := range files {
 		wg.Add(1)
