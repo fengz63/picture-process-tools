@@ -15,7 +15,7 @@ import (
 var processCmd = &cobra.Command{
 	Use:   "process",
 	Short: "Start batch processing images",
-	Run:   runProcess,
+	Run:   func(cmd *cobra.Command, args []string) { runProcess() },
 }
 
 func init() {
@@ -52,7 +52,7 @@ func validateInputs() error {
 	return nil
 }
 
-func runProcess(cmd *cobra.Command, args []string) {
+func runProcess() {
 	// Validate inputs
 	if err := validateInputs(); err != nil {
 		fmt.Printf("Input validation failed: %v\n", err)
@@ -134,8 +134,8 @@ func getImageFiles(dir string, recursive bool) ([]string, error) {
 
 // Separate HEIC and regular image files
 func separateImageFiles(files []string) ([]string, []string) {
-	heicFiles := []string{}
-	regularFiles := []string{}
+	var heicFiles []string
+	var regularFiles []string
 
 	for _, file := range files {
 		ext := filepath.Ext(strings.ToLower(file))
@@ -149,10 +149,10 @@ func separateImageFiles(files []string) ([]string, []string) {
 	return heicFiles, regularFiles
 }
 
-// Process images concurrently
-func processImagesConcurrently(files []string, config processor.Config) {
+// Process images concurrently with custom processing function
+func processImagesConcurrentlyWithFunc(files []string, config processor.Config, processFunc func(string, processor.Config) error) {
 	var wg sync.WaitGroup
-	semaphore := make(chan struct{}, workers) // Use configurable worker count
+	semaphore := make(chan struct{}, workers)
 
 	for _, file := range files {
 		wg.Add(1)
@@ -161,7 +161,7 @@ func processImagesConcurrently(files []string, config processor.Config) {
 			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
 
-			if err := processor.ProcessImage(filePath, config); err != nil {
+			if err := processFunc(filePath, config); err != nil {
 				fmt.Printf("Processing failed %s: %v\n", filePath, err)
 			} else {
 				fmt.Printf("Processing completed: %s\n", filepath.Base(filePath))
@@ -172,25 +172,12 @@ func processImagesConcurrently(files []string, config processor.Config) {
 	wg.Wait()
 }
 
+// Process images concurrently
+func processImagesConcurrently(files []string, config processor.Config) {
+	processImagesConcurrentlyWithFunc(files, config, processor.ProcessImage)
+}
+
 // Process images concurrently while keeping the same format
 func processImagesWithSameFormat(files []string, config processor.Config) {
-	var wg sync.WaitGroup
-	semaphore := make(chan struct{}, workers) // Use configurable worker count
-
-	for _, file := range files {
-		wg.Add(1)
-		go func(filePath string) {
-			defer wg.Done()
-			semaphore <- struct{}{}
-			defer func() { <-semaphore }()
-
-			if err := processor.ProcessImageWithSameFormat(filePath, config); err != nil {
-				fmt.Printf("Processing failed %s: %v\n", filePath, err)
-			} else {
-				fmt.Printf("Processing completed: %s\n", filepath.Base(filePath))
-			}
-		}(file)
-	}
-
-	wg.Wait()
+	processImagesConcurrentlyWithFunc(files, config, processor.ProcessImageWithSameFormat)
 }
