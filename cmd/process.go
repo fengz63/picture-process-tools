@@ -7,9 +7,9 @@ import (
 	"strings"
 	"sync"
 
-	"picture-resize-tools/internal/processor"
-
 	"github.com/spf13/cobra"
+
+	"picture-resize-tools/pkg/processor"
 )
 
 var processCmd = &cobra.Command{
